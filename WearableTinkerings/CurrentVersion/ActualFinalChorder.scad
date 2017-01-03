@@ -128,16 +128,22 @@ module CyberDiskT(){
 //lots of holes punched into the design for a future cover mechanism I plan to develop *will be held to the main body with mechanical-elastic force
 module connectLoopThumb(){
   difference(){
+    // The main body of the handle:
     connectLoopNeg();
     translate([47,-28,-6]) rotate([90,0,-45]) cylinder(h = 70, d = 32, center = true);
     translate([47,-28,-13]) rotate([90,0,-45]) cylinder(h = 70, d = 32, center = true);
+
+    // four through-holes through the handle:
     translate([-40,-4,0]) cylinder(h=200,d=4,center = true);
     mirror(0,1,0) translate([-40,-4,0]) cylinder(h=200,d=4,center = true);    
     mirror(0,1,0) translate([-38,-38,0]) cylinder(h=200,d=4,center = true);
     translate([-40,-38,0]) cylinder(h=200,d=4,center = true);
+
+    // the Feather's position
     mirror([0,0,0]) translate([-15,-20,23]) rotate([10,0,-90]) featherFootprint();
+
     //Core of the radial mount
-    translate([28,-14,-20]) rotate([-102,20,0]) cylinder(h=80,d=4);
+    #translate([28,-14,-20]) rotate([-102,20,0]) cylinder(h=80,d=4);
   }
 }
 
@@ -178,6 +184,7 @@ module BraceMounts(){
 module whole_thing()
 {
 // skrewz@20161214: this expresses the connector piece under the index finger.
+/*
 difference(){
 
   // skrewz@20161214: The bottommost connector piece:
@@ -189,6 +196,7 @@ difference(){
   translate([14,43,-25.5])  rotate([-45,-14,3]) fingerSocketsPos();
   //translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
 }
+*/
 
 
 
@@ -197,6 +205,7 @@ difference(){
 
 //CYBERDISK F DIFF
 
+color("green")
 difference(){
   translate([-3,40, -21])  rotate([-46,-6,11]) CyberDiskF();
   translate([14,43,-25.5])  rotate([-45,-14,3]) fingerSocketsPos();
@@ -220,6 +229,7 @@ difference(){
 
 
 //CYBERDISK T DIFF
+color("blue")
 difference(){
   translate([44,2,-15]) rotate([0,125,0]) CyberDiskT();
 
@@ -239,6 +249,7 @@ difference(){
 }
 
 difference(){
+color("cyan")
   connectLoopThumb();
   //!CyberDiskF();
   //	    translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
@@ -250,7 +261,9 @@ difference(){
 }
 
 //difference(){
+/*color("red")
 BraceMounts();
+*/
 //	    translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
 //translate ([-55,10,-50]) cube([150,100,100]);
 //translate ([-55,-92,-50]) rotate([0,0,11]) cube([150,100,100]);
@@ -265,6 +278,8 @@ BraceMounts();
 //translate ([-55,-92,-50]) rotate([0,0,11]) cube([150,100,100]);
 
 
+/*
+color("cyan")
 difference(){
   translate([44,23,-12]) rotate([-105,0,9]) difference(){
     cylinder(h=16, d=10,$fn=40);
@@ -275,6 +290,7 @@ difference(){
   //			    //translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
   //translate ([-55,-92,-50]) rotate([0,0,11]) cube([150,100,100]);
 }
+*/
 }
 
 render="wholething";
