@@ -16,16 +16,17 @@ m3_cap_clear_height=1.5;
 m3_nut_width=5;
 
 // rough (for finger rest frills) radius of your fingers:
-finger_girth_radius=10;
+finger_girth_radius=15;
+rotate_thumb_plate_by = 5;
 
 fingerplate_extra_length=5;
 // how much the pinky should be rotated closer:
-fingerplate_z_rotation=45;
+fingerplate_z_rotation=35;
 // how much the fingers should be leaning forward on the plate
-fingerplate_x_rotation=-18;
+fingerplate_x_rotation=-20;
 // how much angle the fingertips have compared to the plane of the palm
 // you need hardy anything; pinky a bit higher than index, maybe
-fingerplate_y_rotation=5;
+fingerplate_y_rotation=7;
 
 
 // how much to lift the angled finger_disk() off the plane:
@@ -46,38 +47,13 @@ handHeight = 40;
 //this is the height of the hand(from ground to ceiling) when palm down/up
 handThickness = 38;
 
-//this is the "footprint" of where the thumb switches will reside.
+module compass () {
+  rotate([0,0,0]) color("red") cylinder (r=0.5,h=50);
+  rotate([0,270,0]) color("blue") cylinder (r=0.5,h=50);
+  rotate([270,0,0]) color("green") cylinder (r=0.5,h=50);
+}
+
 module thumbSockets(){ // {{{
-  cable_escape_radius = 2;
-  for (i = [
-      [0,8,0,0], // middle thumb
-      [switchDistance *1.5, 6,0,-13], // far thumb
-      [-switchDistance *1.5, 6,0,+13]]) // near thumb
-  {
-    translate([i[0],i[1],i[2]])
-    {
-      rotate([0,0,i[3]])
-      {
-        // basic cable escape holes:
-        translate([0,0,0])
-          rotate([90+180,0,0])
-          cylinder(r=cable_escape_radius, h=5*touch_steel_nut_slit_length,$fn=15);
-        //translate([0,0,-cable_escape_radius])
-        //  cylinder(r=touch_alu_tube_radius_cutout, h=switchHeight,$fn=25);
-        translate([-touch_steel_nut_width/2,0,0])
-          cube([
-              touch_steel_nut_width,
-              touch_steel_nut_slit_length,
-              touch_steel_nut_slit_length*2]);
-        translate([0,-0.7*finger_girth_radius,1.3*finger_girth_radius])
-        {
-          rotate([90,0,0])
-            cylinder(r=finger_girth_radius, h=5*switchHeight);
-          sphere(r=finger_girth_radius);
-        }
-      }
-    }
-  }
 }
 
 module thumbCableExits(){ // {{{
@@ -111,9 +87,19 @@ module connectLoopNeg(){
     difference(){
       union (){
         translate([-30,-12,-25])
-        cube([50,34,20]);
+          cube([50,34,20]);
+        translate([-59,-22,-8])
+          rotate([0,45,0])
+              cube([27+2+2,44,20]);
+
         scale([1.12, 1, 1.2]) connectLoopPos();
       }
+      // battery-sized cutout
+      translate([-59,-22,-8])
+        rotate([0,45,0])
+          translate([2,1.01,2])
+            // battery needs x=27, y=45, z=10
+            cube([27,44+1,10]);
       scale([1,3.1,1]) connectLoopPos();
       translate([7,0.1,-(handThickness/2)]){
         //		    cube([handWidth*.7,56,handThickness], true);
@@ -124,49 +110,44 @@ module connectLoopNeg(){
 } // }}}
 
 //finger socket modules
-module fingerSocketsPos(){
+module finger_positions(){
   cable_escape_radius = 2;
-  /*
   for (i = [
-      [0                   ,0  ,0,17-fingerplate_z_rotation], // middle
-      [switchDistance*1.5  ,-2 ,0,17-fingerplate_z_rotation], // index
-      [-switchDistance*1.5 ,-2 ,0,17-fingerplate_z_rotation], // ring
-      [-45                 ,-20,0,20-fingerplate_z_rotation] //
-  ]) {
-  */
-  for (i = [
-      [2                   ,7  ,0,21-fingerplate_z_rotation], // middle
-      [switchDistance*1.5  ,-2 ,0,22-fingerplate_z_rotation], // index
-      [-switchDistance*1.5 ,2 ,0,20-fingerplate_z_rotation], // ring
-      [-45                 ,-20,0,23-fingerplate_z_rotation] //
+      [2                   ,7  ,0,24-fingerplate_z_rotation], // middle
+      [switchDistance*1.5  ,-4 ,0,26-fingerplate_z_rotation], // index
+      [-switchDistance*1.5 ,2 ,0,22-fingerplate_z_rotation], // ring
+      [-46                 ,-25,0,23-fingerplate_z_rotation] // pinky
   ]) {
     translate([i[0],i[1],i[2]])
       rotate([0,0,i[3]])
       {
         // TODO: This is technically wrong: the "cap width" shouldn't drill all
         // the way down to the cable escape
-        //translate([0,touch_alu_tube_radius,-cable_escape_radius])
-        //  cylinder(r=touch_alu_tube_radius_cutout, h=switchHeight,$fn=25);
-        translate([-touch_steel_nut_width/2,0,0])
+        translate([-touch_steel_nut_width/2,0,-touch_steel_nut_width/2])
         cube([
             touch_steel_nut_width,
             touch_steel_nut_slit_length,
             touch_steel_nut_slit_length*2]);
 
-        translate([0,-0.7*finger_girth_radius,1.3*finger_girth_radius])
+        translate([0,-0.0*finger_girth_radius,1.3*finger_girth_radius])
         {
-          rotate([90,0,0])
-          cylinder(r=finger_girth_radius, h=2*switchHeight);
-          sphere(r=finger_girth_radius);
-        }
-        //cube([switchWidth+.2, switchHeight+.2, switchThickness],true);
 
-        //rotate([90,0,0]) cylinder(r=2,h=40,$fn=20);
-        //translate([switchDistance *1.5, -2,0])
+          // "bent" (to exploit finger springiness) guide channel:
+          rotate([80,0,0])
+            translate([0,-0.15*finger_girth_radius,0])
+            cylinder(r=finger_girth_radius, h=4*switchHeight);
+
+          translate([0,-finger_girth_radius,0])
+            rotate([90,0,0])
+            cylinder(r=finger_girth_radius, h=4*switchHeight);
+
+          translate([0,0,-0.15*finger_girth_radius])
+            sphere(r=finger_girth_radius);
+        }
         // Cable escape:
-        rotate([80-fingerplate_x_rotation,0,0])
+        rotate([77-fingerplate_x_rotation,0,0])
           translate([0,0,-touch_steel_nut_slit_length])
-          cylinder(r=cable_escape_radius,h=40,$fn=20);
+          cylinder(r=cable_escape_radius,h=80,$fn=20);
       }
   }
   //thumbCableExits();
@@ -223,48 +204,93 @@ module featherFootprint(){ // {{{
 //this is the module for the receiving body for the switches that the index through pinky fingers rest
 module CyberDiskF(){ // {{{
   difference(){
-    scale([1.3,.55,.80]) sphere(handHeight);
+    translate([0,-0.1*handHeight,0])
+    scale([1.2,.75,.80])
+      sphere(handHeight);
     translate([-70,-50,.80]) cube(135);
     //translate([-70,-50,-148]) cube(135);
   }
 } // }}}
-//this one is for the thumbs
-module CyberDiskT(){ // {{{
+
+module thumb_plate(){ // {{{
   difference(){
-    union() {
-      difference() {
-        translate([0,0,-1.52]) scale([1.5,1.3,1]) cylinder(h=switchHeight,d=48,center=true);
-        // bottom cut-out:
-        //translate([-50,-106,-50]) cube([100,100,100]);
-      }
-      translate([-23.2,-14,-0.5*switchHeight-1.52]) rotate([0,0,15]) translate([0,-35,0]) cube([50,40,switchHeight]);
+    union()
+    {
+      translate([-15,-70,10])
+        rotate([270,0,0])
+      cylinder(h=90,r1=10,r2=20);
+      translate([-15,20,10])
+        sphere(r=20);
     }
-    translate ([0,8,0])  thumbSockets();
-    // left cut-out:
-    rotate([0,0,15]) translate([-76,-40,-20])  cube([50,80,30]);
-    // right cut-out:
-    rotate([0,0,-35]) translate([22,-40,-20])  cube([50,80,30]);
-    //translate([-15,6,-5]) rotate([0,90,0]) cylinder(h=30,d=6);
-    // the chamfer towards the palm side:
-    translate([-20,-57,0]) rotate([-15,90,0]) rotate([0,0,30]) translate([-10,0,0]) cube([20,30,50]);
+    //cube([30,70,20]);
+    //scale([1.5,1.3,1])
+    //  cylinder(h=1.5*switchHeight,d=48);
+    // bottom cut-out:
+    //translate([-50,-106,-50]) cube([100,100,100]);
 
-    //translate([0,0,-1*switchHeight])
-    //  rotate([-45,0,0])
-    //  cylinder(r=1.7,h=1*switchHeight,$fn=20);
+    //this is the "footprint" of where the thumb switches will reside.
+    translate ([-15,8,0])
+    {
+      // Finger hole:
+      translate([0,0.5*finger_girth_radius,1.5*finger_girth_radius])
+      {
+        rotate([90,0,0])
+          cylinder(r1=finger_girth_radius, r2=1.2*finger_girth_radius, h=60);
+        sphere(r=finger_girth_radius);
+      }
+      cable_escape_radius = 2;
+      for (i = [
+          //[ 35,9,-15,-20,0],
+          // as looking down on your nail:
+          // [rotation ccw, lift, axial rotation of nut, push away from nail,nut rotation from viewpoint ]
+          [-35,10,20,-27,-30],
+          [ 35,10,20,-25,30],
+          [  0,-3,0,-15,0]])
+      {
+        rotate([0,0,i[0]])
+          translate([0,0,20/2])
+          {
+            // basic cable escape holes:
+            translate([0,15,i[1]])
+              rotate([180+70,0,-i[0]])
+              cylinder(r=cable_escape_radius, h=5*touch_steel_nut_slit_length,$fn=15);
+            //translate([0,0,-cable_escape_radius])
+            //  cylinder(r=touch_alu_tube_radius_cutout, h=switchHeight,$fn=25);
+            translate([-touch_steel_nut_width/2,0,-5+i[1]])
+              rotate([90,0,0])
+              translate([0,0,i[3]])
+              rotate([i[2],i[4],0])
+              cube([
+                  touch_steel_nut_width,
+                  touch_steel_nut_slit_length,
+                  touch_steel_nut_slit_length]);
+          }
+      }
+    }
+    // bottom cut-out
+    translate([-100,-100,-20])  cube([200,200,20]);
+    // rotate the screwholes and glove() cut-out (thumb faces away from palm):
+    rotate([0,0,rotate_thumb_plate_by])
+    {
+      // left cut-out (to ensure glove() fits):
+      translate([-70,-50,-20])  cube([50,38,60]);
+      // the chamfer towards the palm side:
+      translate([-40,-57,0])
+        rotate([0,90,0])
+        rotate([0,0,30])
+        translate([-35,-100,-100])
+        cube([40,200,200]);
 
-    // the screw holes to mount it onto the glove:
-    // translation oddities to align with whole_thing() desired placement:
-    translate([-14.7,-5.6,-2*switchHeight])
-      for(i = [[0,-15,0],[0,-35,0]])
-        rotate([0,0,15])
-        translate(i)
-        {
-          cylinder(r=1.7,h=4*switchHeight,$fn=20);
-          // countersink for screws:
-          translate([0,0,2*switchHeight-6]) cylinder(r=3,h=switchHeight,$fn=20);
-        }
-    //translate([14,38,-18])  rotate([-45,-14,-5]) fingerSocketsPos();
-    //translate([20,-12,22]) rotate([-180,-65,55])  cylinder(h=60,d=4);
+      // the screw holes to mount it onto the glove:
+      translate([-15,0,0])
+        for(i = [[0,-20,0],[0,-40,0]])
+          translate(i)
+          {
+            translate([0,0,-1]) cylinder(r=1.7,h=4*switchHeight,$fn=20);
+            // countersink for screws:
+            translate([0,0,1]) cylinder(r=3,h=switchHeight,$fn=20);
+          }
+    }
   }
 } // }}}
 //another module  this one is the *complete loop module that describes all of the intricacies.
@@ -336,13 +362,13 @@ module finger_disk()
 { // {{{
 
 translate([0,-40,-0.75])
-  rotate([45,12,-11])
+  rotate([45,12,fingerplate_z_rotation-(45+11)])
     difference(){
       translate([-3,40, -21])  rotate([-46,-6,11]) CyberDiskF();
-      translate([14,43,-25.5])  rotate([-45,-14,3]) fingerSocketsPos();
+      translate([14,43,-25.5])  rotate([-45,-14,3]) finger_positions();
       //cascade transformations are translate(0,5,-10) rotate(0,0,8)
 
-      translate([12,10,-20]) rotate([-46,-10,11])  scale([3.5,1.5,.75]) translate ([0,0,-handHeight]) cylinder(h = 2*handHeight, d =20, $fn=40 );
+      //translate([12,10,-20]) rotate([-46,-10,11])  scale([3.5,1.5,.75]) translate ([0,0,-handHeight]) cylinder(h = 2*handHeight, d =20, $fn=40 );
 
       //translate([35,22,-12]) rotate([90,90,30]) cylinder(h=20,d=5,center=true, $fn=20);
       // through-going wire hole
@@ -401,9 +427,6 @@ module finger_plate(x_rotation,y_rotation,z_rotation,plate_lift,fingerplate_extr
           translate([-100,-100,0.01])
           cube([200,200,30]);
 
-        // cut-out for the Feather to fit into
-        translate([-5,-65,2])
-          cube([30,50,2*switchHeight]);
 
         // holes for mounting to glove()
         translate([-7,-80-offset,0])
@@ -422,10 +445,16 @@ module finger_plate(x_rotation,y_rotation,z_rotation,plate_lift,fingerplate_extr
               translate(i)
               {
                 cylinder(r=1.8,h=4*switchHeight,$fn=20);
-                translate ([-24,-0.5*10,-5]) cube([30,10,30]);
+                translate ([-26,-5,5]) cube([30,10,20]);
               }
       }
     }
+    // cut-out for the Feather to fit into
+    translate([-15,-80,2])
+#
+      cube([40,58,switchHeight-2+0.01]);
+    translate([-0,-120,0.5*switchHeight])
+      cube([10,55,20]);
     // cable wiring hole:
     //translate([0,0,0])
     //  rotate([0,0,z_rotation]) rotate([x_rotation,0,0]) rotate([0,y_rotation,0])
@@ -470,37 +499,12 @@ module glove()
       translate([0,0,-1])
         cylinder(r=touch_alu_tube_radius_cutout,h=switchHeight,$fn=20);
     }
+    // cut out for Feather
+    translate([-27,-10,-30])
+    cube([40,20,20]);
   }
 } // }}}
 
-module thumb_plate()
-{ // {{{
-  //CYBERDISK T DIFF
-
-  translate([15,-5,-36.18])
-    rotate([0,-125,0])
-  union()
-  {
-    difference(){
-      translate([44,2,-15]) rotate([0,125,0]) CyberDiskT();
-      
-      //translate([40,0,-12]) rotate([90,90,-50]) cylinder(h=20,d=5,center=true);
-      // the cut-out for another connector mount (under middle thumb button)
-      //translate([48,-9,0]) rotate([-110,20,0])  cylinder(h=62,d=4);
-      //for render one
-      //		    translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
-      //opposite of above
-      //	translate ([-55,10,-50]) cube([150,100,100]);
-      
-      //Core of the radial mount
-      //translate([28,-14,-20]) rotate([-102,20,0]) cylinder(h=80,d=4);
-      //String/cover hole top right
-      //mirror(0,1,0)  translate([-40,-4,0]) cylinder(h=40,d=4,center = true);
-      //  	    translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
-      //	     translate ([-55,-92,-50]) rotate([0,0,11]) cube([150,100,100]);
-    }
-  }
-} // }}}
 
 module whole_thing()
 {
@@ -514,7 +518,7 @@ difference(){
   translate([28,-14,-20]) rotate([-102,20,0]) cylinder(h=80,d=4);
   // skrewz@20161214: cuts out the thumb sockets from the connector piece:
   translate([44,10,-15]) rotate([0,125,0]) thumbSockets();
-  translate([14,43,-25.5])  rotate([-45,-14,3]) fingerSocketsPos();
+  translate([14,43,-25.5])  rotate([-45,-14,3]) finger_positions();
   //translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
 }
 */
@@ -529,12 +533,12 @@ translate([-12,65+extra_length,-38])
   finger_plate(fingerplate_x_rotation,fingerplate_y_rotation,45,necessary_lift,extra_length);
 
 
-translate([19.6,15,-46])
+translate([20,15,-46])
   rotate([0,90,0])
-  rotate([0,0,-15])
+  rotate([0,0,-rotate_thumb_plate_by])
   thumb_plate();
 
-//glove();
+glove();
 
 //difference(){
 /*color("red")
@@ -562,7 +566,7 @@ difference(){
     cylinder(h=18,d=5);
 
   }
-  translate([14,43,-25.5])  rotate([-45,-14,3]) fingerSocketsPos();
+  translate([14,43,-25.5])  rotate([-45,-14,3]) finger_positions();
   //			    //translate ([-55,10,-50]) rotate([0,0,11]) cube([150,100,100]);
   //translate ([-55,-92,-50]) rotate([0,0,11]) cube([150,100,100]);
 }
