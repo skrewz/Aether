@@ -394,11 +394,26 @@ module finger_plate(x_rotation,y_rotation,z_rotation,plate_lift,fingerplate_extr
   //       headers).
   offset = fingerplate_extra_length;
 
+  // Add a switch container (sort of after everything).
+  translate([12,-42-offset,0])
+  {
+    difference()
+    {
+      cube([18,25,15]);
+      translate([3,2,0])
+        cube([13,19,15+0.01]);
+      translate([8,5,5])
+        rotate([90,0,0])
+        cylinder(r=3,h=10,$fs=1);
+    }
+  }
   difference() {
     union(){
+      {
       translate([0,0,plate_lift])
         rotate([0,0,z_rotation]) rotate([x_rotation,0,0]) rotate([0,y_rotation,0])
           finger_disk();
+      }
 
       difference()
       {
@@ -430,7 +445,7 @@ module finger_plate(x_rotation,y_rotation,z_rotation,plate_lift,fingerplate_extr
 
         // holes for mounting to glove()
         translate([-7,-80-offset,0])
-        for (i = [ [0,0,0], [30,0,0]])
+        for (i = [ [-5,0,0], [20,0,0]])
           translate(i)
             translate([0,0,-1.1*switchHeight])
             {
@@ -451,10 +466,13 @@ module finger_plate(x_rotation,y_rotation,z_rotation,plate_lift,fingerplate_extr
     }
     // cut-out for the Feather to fit into
     translate([-15,-80,2])
-#
-      cube([40,58,switchHeight-2+0.01]);
-    translate([-0,-120,0.5*switchHeight])
+      cube([45,58,switchHeight-2+0.01]);
+    translate([-7,-120,0.3*switchHeight])
       cube([10,55,20]);
+    // battery cable hole
+    translate([-20,-65,7])
+      rotate([90,0,90])
+      cylinder(r=3,h=10,$fs=1);
     // cable wiring hole:
     //translate([0,0,0])
     //  rotate([0,0,z_rotation]) rotate([x_rotation,0,0]) rotate([0,y_rotation,0])
@@ -482,7 +500,7 @@ module glove()
     // screw holes for mounting finger_plate():
     // pretty hacked up placement. Add a # and try to make it work, I guess.
     translate([-0.224*handWidth,-15,-handHeight])
-      for (i = [ [0,0,0], [30,0,0]])
+      for (i = [ [-5,0,0], [20,0,0]])
         translate(i)
         {
           cylinder(r=1.7,h=3*switchHeight,$fn=20);
