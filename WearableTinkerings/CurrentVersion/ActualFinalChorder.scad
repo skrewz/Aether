@@ -216,11 +216,14 @@ module thumb_plate(){ // {{{
   difference(){
     union()
     {
-      translate([-15,-70,10])
-        rotate([270,0,0])
-      cylinder(h=90,r1=10,r2=20);
-      translate([-15,20,10])
-        sphere(r=20);
+      scale([1,1,1.4])
+      {
+        translate([-15,-70,10])
+          rotate([270,0,0])
+          cylinder(h=90,r1=10,r2=20);
+        translate([-15,20,10])
+          sphere(r=20);
+      }
     }
     //cube([30,70,20]);
     //scale([1.5,1.3,1])
@@ -229,7 +232,7 @@ module thumb_plate(){ // {{{
     //translate([-50,-106,-50]) cube([100,100,100]);
 
     //this is the "footprint" of where the thumb switches will reside.
-    translate ([-15,8,0])
+    translate ([-15,8,10])
     {
       // Finger hole:
       translate([0,0.5*finger_girth_radius,1.5*finger_girth_radius])
